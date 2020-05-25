@@ -35,8 +35,8 @@ namespace B20_Ex02
                          // Updating boolean state indicates the card is flipped 
                          m_Board[row, col].IsFlipped = false;
                          // Initializing location- Access to Pair struct - using boxing or 
-                        m_Board[row, col].m_Location.m_row = row;
-                        m_Board[row, col].m_Location.m_col = col;
+                        m_Board[row, col].m_Location.m_Row = row;
+                        m_Board[row, col].m_Location.m_Col = col;
                         i_Cards.RemoveAt(indexToAdd);
                     }
                }
