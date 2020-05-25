@@ -6,6 +6,8 @@ namespace B20_Ex02
 {
      class Cell
      {
+
+
           private int m_CellContent;
           private bool m_IsFlipped;
           public Pair m_Location;
