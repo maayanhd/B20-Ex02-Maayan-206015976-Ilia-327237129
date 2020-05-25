@@ -27,38 +27,21 @@ namespace B20_Ex02
           //Readonly optional
           public int Score
           {
-               get
-               {
-                    return m_Score;
-               }
-               set
-               {
-                    m_Score = value;
-               }
+               get => m_Score;
+               set => m_Score = value;
           }
           //Readonly optional
           public string Name
           {
-               get
-               {
-                    return r_Name;
-               }
-               set
-               {
-                    r_Name = value;
-               }
+               get => r_Name;
+               set => r_Name = value;
+               
           }
 
           public ePlayerType enumPlayerType
           {
-               get
-               {
-                    return r_ETypeOfPlayer;
-               }
-               set
-               {
-                    r_ETypeOfPlayer = value;
-               }
+               get => r_ETypeOfPlayer;
+               set => r_ETypeOfPlayer = value;
           }
      }
 }
