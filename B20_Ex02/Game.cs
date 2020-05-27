@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace B20_Ex02
@@ -63,5 +64,41 @@ namespace B20_Ex02
                // Other wise, no need to update the score
                return isAMatch;
           }
+
+          public Player Player1
+          {
+               get
+               {
+                    return m_Player1;
+               }
+               set
+               {
+                    m_Player1 = value;
+               }
+          }
+          public Player Player2
+          {
+               get
+               {
+                    return m_Player2;
+               }
+               set
+               {
+                    m_Player2 = value;
+               }
+          }
+          public Cell this[int i, int j]
+          {
+               get
+               {
+                    return m_Board[i, j];
+               }
+               set
+               {
+                    m_Board[i, j] = value;
+               }
+          }
      }
 }
+
+
