@@ -8,7 +8,7 @@ namespace B20_Ex02
      {
           private int m_CellContent;
           private bool m_IsFlipped;
-          public Pair m_Location;
+          public Location m_Location;
 
           public int CellContent
           {
@@ -32,7 +32,7 @@ namespace B20_Ex02
                     m_IsFlipped = value;
                }
           }
-          public Pair Location
+          public Location Location
           {
                get
                {

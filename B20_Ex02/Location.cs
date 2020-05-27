@@ -4,7 +4,7 @@ using System.Text;
 
 namespace B20_Ex02
 {
-     public struct Pair
+     public struct Location
      {
           public int m_Row;
           public int m_Col;

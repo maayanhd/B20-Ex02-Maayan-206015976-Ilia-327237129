@@ -34,7 +34,7 @@
   <ItemGroup>
     <Compile Include="Cell.cs" />
     <Compile Include="Game.cs" />
-    <Compile Include="Pair.cs" />
+    <Compile Include="Location.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="UI.cs" />

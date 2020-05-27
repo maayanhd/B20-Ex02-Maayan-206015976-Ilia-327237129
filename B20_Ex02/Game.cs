@@ -7,11 +7,15 @@ namespace B20_Ex02
 {
      class Game
      {
-          private Player m_Player1;
-          private Player m_Player2;
-          private Cell[,] m_Board;
-          const int k_HeightIndex= 0;
-          const int k_WidthIndex= 1;
+          private Player m_Player1                      = null;
+          private Player m_Player2                      = null;
+          private Cell[,] m_Board                       = null;
+          private List<Cell> m_AvailableCards              = null;
+          private Dictionary<int, List<Location>> m_SeenCards = null;
+          // Constant values 
+          const int k_HeightIndex                       = 0;
+          const int k_WidthIndex                        = 1;
+
           public Game(int[] i_Measurements,List<int> i_Cards,string [] i_Names, Player.ePlayerType []i_PlayerTypes)
           {
                m_Board = new Cell[i_Measurements[k_HeightIndex],i_Measurements[k_WidthIndex]];
@@ -23,9 +27,10 @@ namespace B20_Ex02
           }
           private void initializeBoard(List<int> i_Cards)
           {
-               int firstDimLength = m_Board.GetLength(0);
+               int firstDimLength  = m_Board.GetLength(0);
                int secondDimLength = m_Board.GetLength(1);
-               Random randObj = new Random();
+               Random randObj      = new Random();
+
                for (int row = 0; row < firstDimLength; row++) 
                {
                     for (int col = 0; col < secondDimLength; col++) 
@@ -35,36 +40,37 @@ namespace B20_Ex02
                          m_Board[row, col].CellContent = i_Cards[indexToAdd];
                          // Updating boolean state indicates the card is flipped 
                          m_Board[row, col].IsFlipped = false;
-                         // Initializing location- Access to Pair struct - using boxing or 
+                         // Initializing location- Access to Location struct - using boxing or 
                         m_Board[row, col].m_Location.m_Row = row;
                         m_Board[row, col].m_Location.m_Col = col;
                         i_Cards.RemoveAt(indexToAdd);
                     }
                }
           }
-          public bool IsAMatch(UI.eCurrentNumPlayer eCurrentPlayer, params Pair[] twoLocations)
+
+          public static void ManageAiStroage(bool i_IsAMatch)
+          {
+
+          }
+          
+          public bool IsThereAMatch(Player io_CurrentPlayer, params Location?[] twoLocations)
           {
                bool isAMatch = false;
-               // Checking whether the player has found a pair of card 
+               // Checking whether the player has found a pair of cards 
                // Need to implement == operator
                if (twoLocations[0].Equals(twoLocations[1]))
                {    
                     isAMatch = true;
                     // Updating score 
-                    // We need to find abbreviation 
-                    if (eCurrentPlayer == UI.eCurrentNumPlayer.Player1)
-                    {
-                         m_Player1.Score++;
-                    }
-                    else
-                    {
-                         m_Player2.Score++;
-                    }
+                    io_CurrentPlayer.Score++;
                }
                // Other wise, no need to update the score
                return isAMatch;
           }
-
+          public bool IsTheGameEnded()
+          {
+               return (AvailableCards.Count == 0);
+          }
           public Player Player1
           {
                get
@@ -87,6 +93,17 @@ namespace B20_Ex02
                     m_Player2 = value;
                }
           }
+          public Cell[,] Board
+          {
+               get
+               {
+                    return m_Board;
+               }
+               set  
+               {
+                    m_Board = value;
+               }
+          }
           public Cell this[int i, int j]
           {
                get
@@ -97,6 +114,39 @@ namespace B20_Ex02
                {
                     m_Board[i, j] = value;
                }
+          }
+          public List<Cell> AvailableCards
+          {
+               get
+               {
+                    return m_AvailableCards;
+               }
+               set
+               {
+                    m_AvailableCards = value;
+               }
+          }
+
+          public Dictionary<int, List<Location>> SeenCards
+          {
+               get
+               {
+                    return m_SeenCards;
+               }
+               set
+               {
+                    m_SeenCards = value;
+               }
+          }
+
+          public void FlipCard(Location? i_CardLocation)
+          {
+
+               int i = i_CardLocation.Value.m_Col,
+                   j = i_CardLocation.Value.m_Row;
+
+               // Flipping Card by logic
+               m_Board[i, j].IsFlipped = !m_Board[i, j].IsFlipped;
           }
      }
 }

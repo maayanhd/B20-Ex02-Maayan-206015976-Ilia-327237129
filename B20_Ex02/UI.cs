@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 
 namespace B20_Ex02
 {
      class UI
      {
-          // Default of boolean is false
-          private static bool finishGame;
-          const char k_exit = 'Q';
-
           private UI()
           {
 
@@ -38,53 +35,70 @@ namespace B20_Ex02
 
           internal static void MakeMoves(Game io_MemoryGame)
           {
-               bool areThereMoreMoves = true;
-               ePlayersTurn eTurn = ePlayersTurn.Player1;
-               Pair? cardLoc1 = null, cardLoc2 = null;
+               Location? cardLocation1 = null,
+                         cardLocation2 = null;
+               Player currentPlayer = io_MemoryGame.Player1;
 
 
-               while (areThereMoreMoves == true)
+               while (io_MemoryGame.IsTheGameEnded() == false)
                {
-                    Player.ePlayerType player1Type = io_MemoryGame.Player1.enumPlayerType;
-                    Player.ePlayerType player2Type = io_MemoryGame.Player2.enumPlayerType;
-                    // First player is always a human
-                    if(io_MemoryGame.Player2.enumPlayerType== (io_MemoryGame.Player2.enumPlayerType == Player.ePlayerType.Human))
+                    // player's type is a human
+                    if (currentPlayer.enumPlayerType == Player.ePlayerType.Human)
                     {
-                         // Assuming returning null if 
-                         cardLoc1 = GetCardLocation(io_MemoryGame, eTurn);
-                         if (cardLoc1 == null)
-                         {
-                              break;
-                              finishGame = true;
-                         }
+                         // First Card
+                         cardLocation1 = GetCardLocationOrExit(io_MemoryGame, currentPlayer);
+                         // Optional reuseability
+                         Ex02.ConsoleUtils.Screen.Clear();
+                         io_MemoryGame.FlipCard(cardLocation1); 
+                         PrintBoard(io_MemoryGame.Board);
 
-                         areThereMoreMoves = (cardLoc1 != null);
-                         cardLoc2 = GetCardLocation(io_MemoryGame, eTurn);
-                         if (cardLoc2 == null)
-                         {
-                              break;
-                              finishGame = true;
-                         }
+                         // Second Card
+                         cardLocation2 = GetCardLocationOrExit(io_MemoryGame, currentPlayer);
 
-                         areThereMoreMoves = (cardLoc2 != null);
-                         eTurn = (eTurn != ePlayersTurn.Player2) ? ePlayersTurn.Player2 : ePlayersTurn.Player1;
-
+                         CompleteMove(io_MemoryGame, currentPlayer, cardLocation1, cardLocation2);
                     }
+                    else
+                    {
+                         currentPlayer.ComputerMove(io_MemoryGame.AvailableCards, io_MemoryGame.SeenCards);
+                    }
+                    // Updating current player
+                    currentPlayer = (currentPlayer == io_MemoryGame.Player1) ? io_MemoryGame.Player2 : io_MemoryGame.Player1;
+               }
+          }
+
+          internal static void CompleteMove(Game io_MemoryGame, Player io_CurrentPlayer, params Location?[] i_PairOfCards)
+          {
+               // Checking if there's a match and updating the status of card if necessary 
+               bool isAMatch = io_MemoryGame.IsThereAMatch(io_CurrentPlayer, i_PairOfCards);
+               
+               // Flipping second card
+               io_MemoryGame.FlipCard(i_PairOfCards[1]);
+               Ex02.ConsoleUtils.Screen.Clear();
+               PrintBoard(io_MemoryGame.Board);
+
+               if (isAMatch == false)
+               {
+                    Thread.Sleep(2000);
+                    // Flipping back cards
+                    io_MemoryGame.FlipCard(i_PairOfCards[0]);
+                    io_MemoryGame.FlipCard(i_PairOfCards[1]);
+                    Ex02.ConsoleUtils.Screen.Clear();
+                    PrintBoard(io_MemoryGame.Board);
                }
 
+               io_MemoryGame.ManageAiStroage(isAMatch);
           }
-          internal static Pair? GetCardLocation(Game io_MemoryGame, ePlayersTurn playerTurn)
+          
+          internal static Location? GetCardLocationOrExit(Game io_MemoryGame, Player CurrentPlayer)
           {
-               string playersTurnName = (playerTurn == ePlayersTurn.Player1)
-                                             ? io_MemoryGame.Player1.Name
-                                             : io_MemoryGame.Player2.Name;
-
-               Console.WriteLine(String.Format("{0}'s turn{1}", playersTurnName, Environment.NewLine));
+               Console.WriteLine(String.Format("{0}'s turn{1}",
+                    CurrentPlayer.Name, 
+                    Environment.NewLine));
 
                return GetHumanMove(io_MemoryGame);
           }
-
-          internal static Pair GetHumanMove(Game io_MemoryGame)
+          
+          internal static Location GetHumanMove(Game io_MemoryGame)
           {
                bool invalidInput = false;
               int column = 0, row = 0;
@@ -97,6 +111,10 @@ namespace B20_Ex02
 
                     Console.WriteLine("Please enter a cell to expose a card: ");
                     string cellString = Console.ReadLine();
+
+                    // Check Whether the 
+
+                    
 
                     // Checking validity of the chosen cell
                     lengthIsValid = cellString.Length <= 2; 
@@ -115,18 +133,12 @@ namespace B20_Ex02
                }
                while (invalidInput == true);
 
-               Pair location;
+               Location location;
                location.m_Col = column;
                location.m_Row = row;
                return location;
           }
 
-          internal enum ePlayersTurn
-          {
-               Player1,
-               Player2,
-               Computer
-          }
           internal static string GetPlayerName()
           {
                string name = null;
@@ -236,12 +248,6 @@ namespace B20_Ex02
                }
           }
 
-          internal enum eCurrentNumPlayer
-          {
-               Player1 = 1,
-               Player2 = 2
-          }
-
           internal static void PrintBoard(Cell[,] i_Board)
           {
                int height = i_Board.GetLength(0);
@@ -311,11 +317,11 @@ namespace B20_Ex02
                     {
                          answer = char.Parse(Console.ReadLine());
 
-                         isValidAnswer = (answer == 'y' || answer == 'n') ? true : false;
+                         isValidAnswer = (answer == 'y' || answer == 'n');
 
                          if(isValidAnswer)
                          {
-                              isPlayingAgain = (answer == 'y') ? true : false;
+                              isPlayingAgain = (answer == 'y');
                          }
                          else
                          {
