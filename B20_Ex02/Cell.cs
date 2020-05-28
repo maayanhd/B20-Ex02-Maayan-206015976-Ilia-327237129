@@ -7,8 +7,15 @@ namespace B20_Ex02
      class Cell
      {
           private int m_CellContent;
-          private bool m_IsFlipped;
+          private bool m_IsFlipped = false;
           private Location m_Location;
+
+          public Cell(int i_CellContent, Location i_Location)
+          {
+
+              m_Location = i_Location;
+              m_CellContent = i_CellContent;
+          }
           public int CellContent
           {
                get

@@ -10,7 +10,8 @@ namespace B20_Ex02
 
           private string m_Name;
           private ePlayerType m_ETypeOfPlayer;
-          private int m_Score; 
+          private int m_Score;
+
           public enum ePlayerType
           {
                Human,
@@ -50,7 +51,11 @@ namespace B20_Ex02
                }
           }
 
-          public ePlayerType enumPlayerType
+          public bool IsComputer()
+          {
+              return this.m_ETypeOfPlayer == ePlayerType.Computer;
+          }
+          public ePlayerType EPlayerType
           {
                get
                {
@@ -86,13 +91,14 @@ namespace B20_Ex02
                     resultMove[0] = chosenCard.Location;
 
 
-                    if (io_SeenCards.TryGetValue(chosenCard.CellContent, out List<Location> seenMatches))
+                    if(io_SeenCards.TryGetValue(chosenCard.CellContent, out List<Location> seenMatches))
                     {
-                         if (seenMatches.Count > 0 && !(chosenCard.Location.Equals(seenMatches[0])))
-                         {
-                              resultMove[1] = seenMatches[0];
-                         }
-                         else
+                        if(seenMatches.Count > 0 && !(chosenCard.Location.Equals(seenMatches[0])))
+                        {
+                            resultMove[1] = seenMatches[0];
+                        }
+                    }
+                    else
                          {
                               int randomCard2 = randomObj.Next(io_AvailableCards.Count);
                               while (randomCard2 == randomCard1)
@@ -102,7 +108,7 @@ namespace B20_Ex02
 
                               resultMove[1] = io_AvailableCards[randomCard2].Location;
                          }
-                    }
+                    
                }
 
                return resultMove;

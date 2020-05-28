@@ -25,7 +25,7 @@ namespace B20_Ex02
 
                     // generating memory cards based on the size of the board 
                     List<int> memoryCards = new List<int>(boardMeasurements[0] * boardMeasurements[1]);
-                    GenerateMemoryCards(memoryCards);
+                    GenerateMemoryCards(memoryCards,boardMeasurements[0]*boardMeasurements[1]);
 
                     Game memoryGame = new Game(boardMeasurements, memoryCards, names, playersTypes);
 
@@ -39,37 +39,69 @@ namespace B20_Ex02
                
                while (io_MemoryGame.IsTheGameEnded() == false)
                {
-                    // player's type is a human
-                    if (currentPlayer.enumPlayerType == Player.ePlayerType.Human)
-                    {
-                         Location? cardLocation1 = null,
-                                   cardLocation2 = null;
+                Location?[] cardLocation = new Location?[2];
 
+                Console.WriteLine(String.Format("{0}'s turn{1}",
+                       currentPlayer.Name,
+                       Environment.NewLine));
+                
+                // player's type is a human
+                if (currentPlayer.EPlayerType == Player.ePlayerType.Human)
+                {
+                    
                          // First Card
-                         cardLocation1 = GetCardLocationOrExit(io_MemoryGame, currentPlayer);
+                         cardLocation[0] = GetHumanMove(io_MemoryGame);
                          // Optional reuseability
                          Ex02.ConsoleUtils.Screen.Clear();
-                         io_MemoryGame.FlipCard(cardLocation1); 
+                         io_MemoryGame.FlipCard(cardLocation[0]); 
                          PrintBoard(io_MemoryGame);
 
                          // Second Card
-                         cardLocation2 = GetCardLocationOrExit(io_MemoryGame, currentPlayer);
-                         CompleteMove(io_MemoryGame, currentPlayer, cardLocation1, cardLocation2);
+                         cardLocation[1] = GetHumanMove(io_MemoryGame);
+                         
                     }
                     else
-                    {
-                         currentPlayer.ComputerMove(io_MemoryGame.AvailableCards, io_MemoryGame.SeenCards);
-                    }
-                    // Updating current player
-                    currentPlayer = (currentPlayer == io_MemoryGame.Player1) ? io_MemoryGame.Player2 : io_MemoryGame.Player1;
+                {
+                    cardLocation = currentPlayer.ComputerMove(io_MemoryGame.AvailableCards, io_MemoryGame.SeenCards);
+                    io_MemoryGame.FlipCard(cardLocation[0]);
+                    PrintBoard(io_MemoryGame);
+                }
+                CompleteMove(io_MemoryGame, currentPlayer, cardLocation[0], cardLocation[1]);
+                // Updating current player
+                currentPlayer = (currentPlayer == io_MemoryGame.Player1) ? io_MemoryGame.Player2 : io_MemoryGame.Player1;
                }
+
+               DeclareWinner(io_MemoryGame.Player1,io_MemoryGame.Player2);
           }
 
+          public static void DeclareWinner(params Player [] io_Players)
+          {
+              Console.WriteLine( String.Format(
+                      "{0}'s Score:{1}{2}{3}'s Score{4}:",
+                      io_Players[0].Name,
+                      io_Players[0].ToString(),
+                      Environment.NewLine,
+                      io_Players[1].Name,
+                      io_Players[1].Score.ToString()));
+
+              if (io_Players[0].Score == io_Players[1].Score)
+              {
+                Console.WriteLine("The game ended with draw");  
+              }
+              else
+              {
+                  string winnerName = (io_Players[0].Score > io_Players[1].Score) ? io_Players[0].Name : io_Players[1].Name;
+                  Console.WriteLine("{0} won",winnerName);
+              }
+          }
+         
           internal static void CompleteMove(Game io_MemoryGame, Player io_CurrentPlayer, params Location?[] i_PairOfCards)
           {
                // Checking if there's a match and updating the status of card if necessary 
                bool isAMatch = io_MemoryGame.IsThereAMatch(io_CurrentPlayer, i_PairOfCards);
-               
+               Cell firstCard = io_MemoryGame.Board[i_PairOfCards[0].Value.Row,i_PairOfCards[0].Value.Col];
+               Cell secondCard = io_MemoryGame.Board[i_PairOfCards[1].Value.Row,i_PairOfCards[1].Value.Col];
+
                // Flipping second card
                io_MemoryGame.FlipCard(i_PairOfCards[1]);
                Ex02.ConsoleUtils.Screen.Clear();
@@ -85,22 +117,14 @@ namespace B20_Ex02
                     PrintBoard(io_MemoryGame);
                }
                // Logic of data structures 
-               io_MemoryGame.UpdateAvailableCards(isAMatch, i_PairOfCards);
-               io_MemoryGame.UpdateSeenCards(isAMatch, i_PairOfCards);
+               io_MemoryGame.UpdateAvailableCards(isAMatch, firstCard,secondCard);
+               io_MemoryGame.UpdateSeenCards(isAMatch, firstCard,secondCard);
           }
 
-          internal static Location? GetCardLocationOrExit(Game io_MemoryGame, Player CurrentPlayer)
-          {
-               Console.WriteLine(String.Format("{0}'s turn{1}",
-                    CurrentPlayer.Name, 
-                    Environment.NewLine));
-
-               return GetHumanMove(io_MemoryGame);
-          }
           
           internal static Location GetHumanMove(Game io_MemoryGame)
           {
-               bool invalidInput = false;
+              bool invalidInput = false;
               int column = 0, row = 0;
               
                do
@@ -112,23 +136,26 @@ namespace B20_Ex02
                     Console.WriteLine("Please enter a cell to expose a card: ");
                     string cellString = Console.ReadLine();
 
-                    // Check Whether the 
-
+                    // Check Whether the user pressed Q
+                    if(cellString.Equals("Q"))
+                    {
+                        Environment.Exit(0);
+                    }
                     
 
                     // Checking validity of the chosen cell
                     lengthIsValid = cellString.Length <= 2; 
                     isUpperCase   = lengthIsValid && char.IsUpper(cellString, 0);
                     column = (isUpperCase == true) ? (int)(cellString[0] - 'A') : -1; // Assigning -1 to column in case invalid
-                    invalidInput  = (isUpperCase && char.IsDigit(cellString, 1) == false);
+                    invalidInput = isUpperCase && char.IsDigit(cellString, 1)==false;
 
-                    if(invalidInput == false)
+                    if(invalidInput == true)
                     {
                          Console.WriteLine("Invalid input location, Please try again.");
                     }
                     else
                     {
-                         row = cellString[1] - 1;
+                         row = (int)(char.GetNumericValue(cellString[1]) - 1);
                     }
                }
                while (invalidInput == true);
@@ -193,9 +220,10 @@ namespace B20_Ex02
 
           }
           // poorly implemented?
-          internal static bool IsHeightOrWheightValid(int io_Measurement)
+          internal static bool IsHeightOrWheightValid(out int io_Measurement)
           {
                bool inputIsValid = false;
+               io_Measurement = 0;
 
                while (inputIsValid == false)
                {
@@ -204,18 +232,21 @@ namespace B20_Ex02
                     {
                          Console.WriteLine("The input must be a number, please try again");
                     }
-                    else if(io_Measurement <= 4) 
+                    else if(io_Measurement < 4) 
                     {
                          Console.WriteLine("The minimum value is 4, please try again");
+                         inputIsValid = false;
                     }
                     else if (io_Measurement > 6)
                     {
                          Console.WriteLine("The maximum value is 6, please try again");
+                         inputIsValid = false;
                     }
                     else
                     {
                          inputIsValid = true;
                     }
+                    
                }
 
                return inputIsValid;
@@ -232,13 +263,13 @@ namespace B20_Ex02
                          Console.WriteLine("Please enter the height of the board");
 
                     }
-                    while(IsHeightOrWheightValid(io_BoardMeasurementArr[0]) == false);
+                    while(IsHeightOrWheightValid(out io_BoardMeasurementArr[0]) == false);
 
                     {
                          Console.WriteLine("Please enter the width of the board");
 
                     }
-                    while (IsHeightOrWheightValid(io_BoardMeasurementArr[1]) == false);
+                    while (IsHeightOrWheightValid(out io_BoardMeasurementArr[1]) == false);
                 
                     if((io_BoardMeasurementArr[0] * io_BoardMeasurementArr[1]) % 2 != 0)
                     {
@@ -251,11 +282,12 @@ namespace B20_Ex02
                }
                while(inputIsValid == false);
           }
-          internal static void GenerateMemoryCards(List<int> io_MemoryCards)
+          internal static void GenerateMemoryCards(List<int> io_MemoryCards,int i_NumOfCards)
           {
-               for (int i = 0; i < io_MemoryCards.Count; i += 2)
+               for (int i = 0; i < i_NumOfCards; i +=2)
                {
-                    io_MemoryCards[i] = io_MemoryCards[i + 1] = 'A' + i;
+                    io_MemoryCards.Add((int)'A' + i);
+                    io_MemoryCards.Add((int)'A' + i);
                }
           }
 
@@ -337,7 +369,7 @@ namespace B20_Ex02
 
                    if ( (answer != 'y' && answer != 'n') || char.TryParse(Console.ReadLine(), out answer) == false)
                    {
-                        Console.WriteLine("Invalid input please enter, please try again");
+                        Console.WriteLine("Invalid input, please try again");
                         isValidAnswer = false;
                    }
                    else
