@@ -38,9 +38,8 @@ namespace B20_Ex02
               Player currentPlayer = io_MemoryGame.Player1;
               Cell [] chosenCards = new Cell[2];
             while (io_MemoryGame.IsTheGameEnded() == false)
-               {
+            {
                 
-
                 Console.WriteLine(String.Format("{0}'s turn{1}",
                        currentPlayer.Name,
                        Environment.NewLine));
@@ -48,31 +47,24 @@ namespace B20_Ex02
                 // player's type is a human
                 if (currentPlayer.EPlayerType == Player.ePlayerType.Human)
                 {
-                    
-                         // First Card
-                         chosenCards[0] = GetHumanMove(io_MemoryGame);
-                         // Optional reuseability
-                         Ex02.ConsoleUtils.Screen.Clear();
-                         io_MemoryGame.FlipCard(chosenCards[0]); 
-                         PrintBoard(io_MemoryGame);
-
-                         // Second Card
-                         chosenCards[1] = GetHumanMove(io_MemoryGame);
-                         
-                    }
-                    else
+                     // First Card
+                     chosenCards[0] = GetHumanMove(io_MemoryGame);
+                }
+                else
                 {
                     chosenCards = currentPlayer.ComputerMove(io_MemoryGame);
-                    io_MemoryGame.FlipCard(chosenCards[0]);
-                    PrintBoard(io_MemoryGame);
                 }
+                io_MemoryGame.FlipCard(chosenCards[0]);
+                Ex02.ConsoleUtils.Screen.Clear();
+                PrintBoard(io_MemoryGame);
+                chosenCards[1] = (currentPlayer.EPlayerType == Player.ePlayerType.Human) ? GetHumanMove(io_MemoryGame) : chosenCards[1];
 
                 CompleteMove(io_MemoryGame, currentPlayer, chosenCards);
                 // Updating current player
                 currentPlayer = (currentPlayer == io_MemoryGame.Player1) ? io_MemoryGame.Player2 : io_MemoryGame.Player1;
-               }
+            }
 
-               DeclareWinner(io_MemoryGame.Player1,io_MemoryGame.Player2);
+            DeclareWinner(io_MemoryGame.Player1,io_MemoryGame.Player2);
           }
 
           public static void DeclareWinner(params Player [] io_Players)

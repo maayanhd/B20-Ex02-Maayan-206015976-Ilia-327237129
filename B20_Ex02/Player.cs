@@ -79,6 +79,7 @@ namespace B20_Ex02
                     {
                         chosenLocation[0] = item[0];
                         chosenLocation[1] = item[1];
+                        break;
                     }
 
                }
@@ -113,6 +114,7 @@ namespace B20_Ex02
 
                resultMove[0] = io_CurrentGame.Board[chosenLocation[0].Value.Row, chosenLocation[0].Value.Col];
                resultMove[1] = io_CurrentGame.Board[chosenLocation[1].Value.Row, chosenLocation[1].Value.Col];
+                
                return resultMove;
           }
      }
