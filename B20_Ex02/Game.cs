@@ -19,13 +19,13 @@ namespace B20_Ex02
           public Game(int[] i_Measurements,List<int> i_Cards,string [] i_Names, Player.ePlayerType []i_PlayerTypes)
           {
                m_Board = new Cell[i_Measurements[k_HeightIndex],i_Measurements[k_WidthIndex]];
-               initializeBoard(i_Cards);
+               initializeBoardAndAvailableCards(i_Cards);
                m_Player1.Name = i_Names[0];
                m_Player2.Name = i_Names[1];
                m_Player1.enumPlayerType = i_PlayerTypes[0];
                m_Player2.enumPlayerType = i_PlayerTypes[1];
           }
-          private void initializeBoard(List<int> i_Cards)
+          private void initializeBoardAndAvailableCards(List<int> i_Cards)
           {
                int firstDimLength  = m_Board.GetLength(0);
                int secondDimLength = m_Board.GetLength(1);
@@ -37,6 +37,9 @@ namespace B20_Ex02
                     {
                          // Randomizing a card to put in the current location on the board 
                          int indexToAdd = randObj.Next(1, i_Cards.Count) - 1;
+                         int availableCardsInd = 0;
+                         bool isFlipped = false;
+
                          m_Board[row, col].CellContent = i_Cards[indexToAdd];
                          // Updating boolean state indicates the card is flipped 
                          m_Board[row, col].IsFlipped = false;
@@ -44,15 +47,28 @@ namespace B20_Ex02
                         m_Board[row, col].m_Location.m_Row = row;
                         m_Board[row, col].m_Location.m_Col = col;
                         i_Cards.RemoveAt(indexToAdd);
+                        // Initializing available cards storage
+                        this.AvailableCards.Add(m_Board[row, col]);
                     }
                }
           }
 
-          public static void ManageAiStroage(bool i_IsAMatch)
+          public void ManageAiStroage(bool i_IsAMatch)
+          {
+               UpdateAvailableCards(isAMatch);
+               UpdateSeenCards(isAMatch);
+          }
+
+          public void UpdateAvailableCards(bool i_IsAMatch)
           {
 
           }
-          
+          public void UpdateSeenCards(bool i_IsAMatch)
+          {
+
+          }
+
+
           public bool IsThereAMatch(Player io_CurrentPlayer, params Location?[] twoLocations)
           {
                bool isAMatch = false;
