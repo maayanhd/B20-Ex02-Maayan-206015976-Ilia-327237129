@@ -36,10 +36,10 @@ namespace B20_Ex02
           internal static void HandleMoves(Game io_MemoryGame)
           {
               Player currentPlayer = io_MemoryGame.Player1;
-               
-               while (io_MemoryGame.IsTheGameEnded() == false)
+              Cell [] chosenCards = new Cell[2];
+            while (io_MemoryGame.IsTheGameEnded() == false)
                {
-                Location?[] cardLocation = new Location?[2];
+                
 
                 Console.WriteLine(String.Format("{0}'s turn{1}",
                        currentPlayer.Name,
@@ -50,23 +50,24 @@ namespace B20_Ex02
                 {
                     
                          // First Card
-                         cardLocation[0] = GetHumanMove(io_MemoryGame);
+                         chosenCards[0] = GetHumanMove(io_MemoryGame);
                          // Optional reuseability
                          Ex02.ConsoleUtils.Screen.Clear();
-                         io_MemoryGame.FlipCard(cardLocation[0]); 
+                         io_MemoryGame.FlipCard(chosenCards[0]); 
                          PrintBoard(io_MemoryGame);
 
                          // Second Card
-                         cardLocation[1] = GetHumanMove(io_MemoryGame);
+                         chosenCards[1] = GetHumanMove(io_MemoryGame);
                          
                     }
                     else
                 {
-                    cardLocation = currentPlayer.ComputerMove(io_MemoryGame.AvailableCards, io_MemoryGame.SeenCards);
-                    io_MemoryGame.FlipCard(cardLocation[0]);
+                    chosenCards = currentPlayer.ComputerMove(io_MemoryGame);
+                    io_MemoryGame.FlipCard(chosenCards[0]);
                     PrintBoard(io_MemoryGame);
                 }
-                CompleteMove(io_MemoryGame, currentPlayer, cardLocation[0], cardLocation[1]);
+
+                CompleteMove(io_MemoryGame, currentPlayer, chosenCards);
                 // Updating current player
                 currentPlayer = (currentPlayer == io_MemoryGame.Player1) ? io_MemoryGame.Player2 : io_MemoryGame.Player1;
                }
@@ -95,15 +96,13 @@ namespace B20_Ex02
               }
           }
          
-          internal static void CompleteMove(Game io_MemoryGame, Player io_CurrentPlayer, params Location?[] i_PairOfCards)
+          internal static void CompleteMove(Game io_MemoryGame, Player io_CurrentPlayer, params Cell[] io_ChosenCards)
           {
                // Checking if there's a match and updating the status of card if necessary 
-               bool isAMatch = io_MemoryGame.IsThereAMatch(io_CurrentPlayer, i_PairOfCards);
-               Cell firstCard = io_MemoryGame.Board[i_PairOfCards[0].Value.Row,i_PairOfCards[0].Value.Col];
-               Cell secondCard = io_MemoryGame.Board[i_PairOfCards[1].Value.Row,i_PairOfCards[1].Value.Col];
+               bool isAMatch = io_MemoryGame.IsThereAMatch(io_CurrentPlayer, io_ChosenCards);
 
                // Flipping second card
-               io_MemoryGame.FlipCard(i_PairOfCards[1]);
+               io_MemoryGame.FlipCard(io_ChosenCards[1]);
                Ex02.ConsoleUtils.Screen.Clear();
                PrintBoard(io_MemoryGame);
 
@@ -111,59 +110,53 @@ namespace B20_Ex02
                {    // Screen suspension for 2 seconds
                     Thread.Sleep(2000);
                     // Flipping back cards
-                    io_MemoryGame.FlipCard(i_PairOfCards[0]);
-                    io_MemoryGame.FlipCard(i_PairOfCards[1]);
+                    io_MemoryGame.FlipCard(io_ChosenCards[0]);
+                    io_MemoryGame.FlipCard(io_ChosenCards[1]);
                     Ex02.ConsoleUtils.Screen.Clear();
                     PrintBoard(io_MemoryGame);
                }
                // Logic of data structures 
-               io_MemoryGame.UpdateAvailableCards(isAMatch, firstCard,secondCard);
-               io_MemoryGame.UpdateSeenCards(isAMatch, firstCard,secondCard);
+               io_MemoryGame.UpdateAvailableCards(isAMatch,io_ChosenCards);
+               io_MemoryGame.UpdateSeenCards(isAMatch, io_ChosenCards);
           }
 
-          
-          internal static Location GetHumanMove(Game io_MemoryGame)
+
+          internal static Cell GetHumanMove(Game io_MemoryGame)
           {
-              bool invalidInput = false;
-              int column = 0, row = 0;
-              
-               do
-               {
-                    // Boolean contains the status of the last check of input
-                    bool lengthIsValid   = false, 
-                         isUpperCase     = false;
 
-                    Console.WriteLine("Please enter a cell to expose a card: ");
-                    string cellString = Console.ReadLine();
+              bool inputIsValid = false;
+              Console.WriteLine("Please enter a cell to expose a card: ");
+              Cell cardChosen = null;
+              int i, j;
+              while(inputIsValid == false)
+              {
+                  string cellString = Console.ReadLine();
+                  j = cellString[0] - 'A';
+                  int.TryParse(cellString[1].ToString(), out i);
+                  i--;
+                  if (cellString.Length != 2 || char.IsUpper(cellString[0]) == false || char.IsDigit(cellString[1]) == false)
+                  {
+                      Console.WriteLine("The input must be in the next format: A2,C3,E1");
+                  }
+                  else if(io_MemoryGame.IsLocationInRange(new Location(i,j)) == false)
+                  {
+                      Console.WriteLine("The location must be in range of the board");
+                  }
+                  else
+                  {
+                      if(io_MemoryGame.Board[i, j].IsFlipped)
+                      {
+                          Console.WriteLine("The card is already exposed");
+                      }
+                      else
+                      {
+                          inputIsValid = true;
+                          cardChosen = io_MemoryGame.Board[i, j];
+                      }
+                  }
+              }
 
-                    // Check Whether the user pressed Q
-                    if(cellString.Equals("Q"))
-                    {
-                        Environment.Exit(0);
-                    }
-                    
-
-                    // Checking validity of the chosen cell
-                    lengthIsValid = cellString.Length <= 2; 
-                    isUpperCase   = lengthIsValid && char.IsUpper(cellString, 0);
-                    column = (isUpperCase == true) ? (int)(cellString[0] - 'A') : -1; // Assigning -1 to column in case invalid
-                    invalidInput = isUpperCase && char.IsDigit(cellString, 1)==false;
-
-                    if(invalidInput == true)
-                    {
-                         Console.WriteLine("Invalid input location, Please try again.");
-                    }
-                    else
-                    {
-                         row = (int)(char.GetNumericValue(cellString[1]) - 1);
-                    }
-               }
-               while (invalidInput == true);
-
-               Location location;
-               location.m_Col = column;
-               location.m_Row = row;
-               return location;
+              return cardChosen;
           }
 
           internal static string GetPlayerName()
@@ -220,7 +213,7 @@ namespace B20_Ex02
 
           }
           // poorly implemented?
-          internal static bool IsHeightOrWheightValid(out int io_Measurement)
+          internal static bool IsMeasurementValid(out int io_Measurement)
           {
                bool inputIsValid = false;
                io_Measurement = 0;
@@ -263,13 +256,13 @@ namespace B20_Ex02
                          Console.WriteLine("Please enter the height of the board");
 
                     }
-                    while(IsHeightOrWheightValid(out io_BoardMeasurementArr[0]) == false);
+                    while(IsMeasurementValid(out io_BoardMeasurementArr[0]) == false);
 
                     {
                          Console.WriteLine("Please enter the width of the board");
 
                     }
-                    while (IsHeightOrWheightValid(out io_BoardMeasurementArr[1]) == false);
+                    while (IsMeasurementValid(out io_BoardMeasurementArr[1]) == false);
                 
                     if((io_BoardMeasurementArr[0] * io_BoardMeasurementArr[1]) % 2 != 0)
                     {
@@ -284,7 +277,7 @@ namespace B20_Ex02
           }
           internal static void GenerateMemoryCards(List<int> io_MemoryCards,int i_NumOfCards)
           {
-               for (int i = 0; i < i_NumOfCards; i +=2)
+               for (int i = 0; i < i_NumOfCards/2; i ++)
                {
                     io_MemoryCards.Add((int)'A' + i);
                     io_MemoryCards.Add((int)'A' + i);
@@ -325,13 +318,13 @@ namespace B20_Ex02
           
           internal static void PrintLettersLine(int i_BoardWidth)
           {
-               String lettersLine = "   ";
+               String lettersLine = "    ";
 
                Console.Write(lettersLine);
 
                for (int i = 0; i < i_BoardWidth; i++)
                {
-                    String letterCell = String.Format(" {0}  ", ((char)i + 'A').ToString());
+                    String letterCell = String.Format(" {0}  ", (char)(i + 'A'));
                     Console.Write(letterCell);
                }
           }

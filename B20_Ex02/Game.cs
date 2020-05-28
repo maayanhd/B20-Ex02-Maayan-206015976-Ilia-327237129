@@ -12,11 +12,12 @@ namespace B20_Ex02
         private Cell[,] m_Board = null;
         private List<Cell> m_AvailableCards = null;
         private Dictionary<int, List<Location>> m_SeenCards = null;
+        
         // Constant values 
         const int k_HeightIndex = 0;
         const int k_WidthIndex = 1;
 
-        public Game(int[] i_Measurements, List<int> i_Cards, string[] i_Names, Player.ePlayerType[] i_PlayerTypes)
+        public Game(int[] i_Measurements, List<int> i_Cards, string[] i_Names,Player.ePlayerType[] i_PlayerTypes)
         {
             m_Board = new Cell[i_Measurements[k_HeightIndex], i_Measurements[k_WidthIndex]];
             AvailableCards = new List<Cell>();
@@ -78,6 +79,7 @@ namespace B20_Ex02
 
         public void AddIfNotInSeenCards(Cell io_CardToAdd)
         {
+            
             if (SeenCards.TryGetValue(io_CardToAdd.CellContent, out List<Location> keyList))
             {
                 if (keyList.Contains(io_CardToAdd.Location) == false)
@@ -85,7 +87,19 @@ namespace B20_Ex02
                     keyList.Add(io_CardToAdd.Location);
                 }
             }
+            else
+            {
+                SeenCards.Add(io_CardToAdd.CellContent,new List<Location>());
+                SeenCards[io_CardToAdd.CellContent].Add(io_CardToAdd.Location);
+            }
 
+        }
+
+        public bool IsLocationInRange(Location i_LocationToCheck)
+        {
+            bool rowInRange = (i_LocationToCheck.Row < m_Board.GetLength(0) && i_LocationToCheck.Row >= 0);
+            bool colInRange = (i_LocationToCheck.Col < m_Board.GetLength(1) && i_LocationToCheck.Col >= 0);
+            return rowInRange && colInRange;
         }
 
         public void HandleAvailableRemoval(Location? i_CardLocation)
@@ -105,12 +119,12 @@ namespace B20_Ex02
             }
         }
 
-        public bool IsThereAMatch(Player io_CurrentPlayer, params Location?[] pairOfCards)
+        public bool IsThereAMatch(Player io_CurrentPlayer, params Cell[] io_Cards)
         {
             bool isAMatch = false;
             // Checking whether the player has found a pair of cards 
             // Need to implement == operator
-            if (pairOfCards[0].Equals(pairOfCards[1]))
+            if (io_Cards[0].Equals(io_Cards[1]))
             {
                 isAMatch = true;
                 // Updating score 
@@ -193,11 +207,11 @@ namespace B20_Ex02
             }
         }
 
-        public void FlipCard(Location? i_CardLocation)
+        public void FlipCard(Cell io_CardToFlip)
         {
 
-            int i = i_CardLocation.Value.m_Row,
-                j = i_CardLocation.Value.m_Col;
+            int i = io_CardToFlip.Location.Row,
+                j = io_CardToFlip.Location.Col;
 
             // Flipping Card by logic
             m_Board[i, j].IsFlipped = !m_Board[i, j].IsFlipped;

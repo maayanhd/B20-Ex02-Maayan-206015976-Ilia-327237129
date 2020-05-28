@@ -49,5 +49,10 @@ namespace B20_Ex02
                     m_Location = value;
                }
           }
+
+          public bool Equals(Cell io_CellToCompare)
+          {
+              return this.m_CellContent == io_CellToCompare.CellContent;
+          }
      }
 }
