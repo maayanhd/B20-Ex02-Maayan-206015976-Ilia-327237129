@@ -85,8 +85,8 @@ namespace B20_Ex02
                     PrintBoard(io_MemoryGame);
                }
                // Logic of data structures 
-               io_MemoryGame.UpdateAvailableCards(isAMatch);
-               io_MemoryGame.UpdateSeenCards(isAMatch);
+               io_MemoryGame.UpdateAvailableCards(isAMatch, i_PairOfCards);
+               io_MemoryGame.UpdateSeenCards(isAMatch, i_PairOfCards);
           }
 
           internal static Location? GetCardLocationOrExit(Game io_MemoryGame, Player CurrentPlayer)

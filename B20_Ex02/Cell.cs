@@ -8,16 +8,7 @@ namespace B20_Ex02
      {
           private int m_CellContent;
           private bool m_IsFlipped;
-          public Location m_Location;
-
-          public Cell(int i_CellContent, bool i_IsFlipped, params int[] i_CardCoordinates)
-          {
-               m_CellContent  = i_CellContent;
-               m_IsFlipped    = i_IsFlipped;
-               m_Location.Row = i_CardCoordinates[0];
-               m_Location.Col = i_CardCoordinates[1];
-
-          }
+          private Location m_Location;
           public int CellContent
           {
                get

@@ -44,8 +44,8 @@ namespace B20_Ex02
                          // Updating boolean state indicates the card is flipped 
                          m_Board[row, col].IsFlipped = false;
                          // Initializing location- Access to Location struct - using boxing or 
-                        m_Board[row, col].m_Location.m_Row = row;
-                        m_Board[row, col].m_Location.m_Col = col;
+                        m_Board[row, col].Location.Row= row;
+                        m_Board[row, col].Location.Col = col;
                         i_Cards.RemoveAt(indexToAdd);
                         // Initializing available cards storage
                         this.AvailableCards.Add(m_Board[row, col]);
@@ -53,34 +53,68 @@ namespace B20_Ex02
                }
           }
 
-          public void ManageAiStroage(bool i_IsAMatch)
+          public void UpdateAvailableCards(bool i_IsAMatch, Location?[] io_PairOfCards)
           {
-               UpdateAvailableCards(isAMatch);
-               UpdateSeenCards(isAMatch);
+               // in case there's a match- we'll erase the matching pair from the storage
+               if (i_IsAMatch == true)
+               {
+                    // Can be better implemented
+                    HandleAvailableRemoval(io_PairOfCards[0]);
+                    HandleAvailableRemoval(io_PairOfCards[1]);
+               }
+               
+          }
+          public void UpdateSeenCards(bool i_IsAMatch, Location?[] io_PairOfCards)
+          {
+               if(i_IsAMatch == true)
+               {
+                    // In case there's a match we need to remove the elements tha't have been seen
+                    HandleSeenCardsRemoval(io_PairOfCards[0].Value);
+                    HandleSeenCardsRemoval(io_PairOfCards[1].Value);
+               }
           }
 
-          public void UpdateAvailableCards(bool i_IsAMatch)
+          public void HandleSeenCardsRemoval(Location? i_CardLocation)
           {
-
+               int i         = i_CardLocation.Value.Row,
+               j             = i_CardLocation.Value.Col;
+               bool hasValue = true;
+              SeenCards.TryGetValue(Board[i, j].CellContent, out List<Location> i_OutputList);
+              if(i_OutputList.Count == 2)
+              {
+                   SeenCards.Remove(Board[i, j].CellContent);
+              }
           }
-          public void UpdateSeenCards(bool i_IsAMatch)
+          public void HandleAvailableRemoval(Location? i_CardLocation)
           {
+               // Design need to be fixed
+               int i = i_CardLocation.Value.Row, j = i_CardLocation.Value.Col;
+               bool isDoneRemoving = false;
 
+               for(int index = 0; i < AvailableCards.Count && isDoneRemoving == false; index++)
+               {
+                    isDoneRemoving = (AvailableCards.Equals(Board[i, j]));
+
+                    if(isDoneRemoving == true)
+                    {
+                         AvailableCards.RemoveAt(index);
+                    }
+               }
           }
 
-
-          public bool IsThereAMatch(Player io_CurrentPlayer, params Location?[] twoLocations)
-          {
+          public bool IsThereAMatch(Player io_CurrentPlayer, params Location?[] pairOfCards)
+               {
                bool isAMatch = false;
                // Checking whether the player has found a pair of cards 
                // Need to implement == operator
-               if (twoLocations[0].Equals(twoLocations[1]))
+               if (pairOfCards[0].Equals(pairOfCards[1]))
                {    
                     isAMatch = true;
                     // Updating score 
                     io_CurrentPlayer.Score++;
                }
-               // Other wise, no need to update the score
+               // Other wise, no need to
+               // the score
                return isAMatch;
           }
           public bool IsTheGameEnded()
@@ -120,6 +154,7 @@ namespace B20_Ex02
                     m_Board = value;
                }
           }
+
           public Cell this[int i, int j]
           {
                get
