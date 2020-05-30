@@ -72,6 +72,7 @@ namespace B20_Ex02
                Location?[] chosenLocation = new Location?[2];
                Cell [] resultMove = new Cell[2];
 
+               // checks if we saw 2 equal available cards
                foreach (List<Location> item in io_CurrentGame.SeenCards.Values)
                {
 
@@ -84,30 +85,26 @@ namespace B20_Ex02
 
                }
 
+               // choose 1 random card, and check if we saw available card that equals to the first 
                if (chosenLocation[0] == null)
                {
-                    Random randomObj = new Random();
-                    int randomCard1 = randomObj.Next(io_CurrentGame.AvailableCards.Count - 1);
-                    resultMove[0] = io_CurrentGame.AvailableCards[randomCard1];
+                    chosenLocation[0] = RandomizeAvailableLocation(io_CurrentGame.AvailableCards);
+                    resultMove[0] = io_CurrentGame.Board[chosenLocation[0].Value.Row, chosenLocation[0].Value.Col];
                     chosenLocation[0] = resultMove[0].Location;
 
 
-                    if(io_CurrentGame.SeenCards.TryGetValue(resultMove[0].CellContent, out List<Location> seenMatches))
+                    // and check if we saw available card that equals to the first 
+                    if(io_CurrentGame.SeenCards.TryGetValue(resultMove[0].CellContent, out List<Location> seenMatches) && seenMatches.Count > 0 && (resultMove[0].Location.Equals(seenMatches[0])) == false) 
                     {
-                        if(seenMatches.Count > 0 && !(resultMove[0].Location.Equals(seenMatches[0])))
-                        {
                             chosenLocation[1] = seenMatches[0];
-                        }
                     }
-                    else
+                    else // chose the second card randomly aswell
                     {
-                        int randomCard2 = randomObj.Next(io_CurrentGame.AvailableCards.Count);
-                        while (randomCard2 == randomCard1)
+                        chosenLocation[1] = RandomizeAvailableLocation(io_CurrentGame.AvailableCards);
+                        while(chosenLocation[0].Equals(chosenLocation[1]))
                         {
-                            randomCard2 = randomObj.Next(io_CurrentGame.AvailableCards.Count);
+                            chosenLocation[1] = RandomizeAvailableLocation(io_CurrentGame.AvailableCards);
                         }
-
-                        chosenLocation[1] = io_CurrentGame.AvailableCards[randomCard2].Location;
                     }
                     
                }
@@ -116,6 +113,16 @@ namespace B20_Ex02
                resultMove[1] = io_CurrentGame.Board[chosenLocation[1].Value.Row, chosenLocation[1].Value.Col];
                 
                return resultMove;
+          }
+
+          public Location RandomizeAvailableLocation(List<Cell> io_AvailableCards)
+          {
+
+              Random randomObj = new Random();
+              int randomIndex = randomObj.Next(io_AvailableCards.Count-1);
+
+              return io_AvailableCards[randomIndex].Location;
+
           }
      }
 }

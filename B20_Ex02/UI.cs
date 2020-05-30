@@ -69,10 +69,10 @@ namespace B20_Ex02
 
           public static void DeclareWinner(params Player [] io_Players)
           {
-              Console.WriteLine( String.Format(
+              Console.WriteLine(String.Format(
                       "{0}'s Score:{1}{2}{3}'s Score{4}:",
                       io_Players[0].Name,
-                      io_Players[0].ToString(),
+                      io_Players[0].Score.ToString(),
                       Environment.NewLine,
                       io_Players[1].Name,
                       io_Players[1].Score.ToString()));
@@ -119,18 +119,16 @@ namespace B20_Ex02
               bool inputIsValid = false;
               Console.WriteLine("Please enter a cell to expose a card: ");
               Cell cardChosen = null;
-              int i, j;
+              int i=0, j=0;
               while(inputIsValid == false)
               {
                   string cellString = Console.ReadLine();
-                  j = cellString[0] - 'A';
-                  int.TryParse(cellString[1].ToString(), out i);
-                  i--;
+
                   if (cellString.Length != 2 || char.IsUpper(cellString[0]) == false || char.IsDigit(cellString[1]) == false)
                   {
                       Console.WriteLine("The input must be in the next format: A2,C3,E1");
                   }
-                  else if(io_MemoryGame.IsLocationInRange(new Location(i,j)) == false)
+                  else if(io_MemoryGame.IsLocationInRange(new Location(i=int.Parse(cellString[1].ToString()),j= cellString[0] - 'A')) == false)
                   {
                       Console.WriteLine("The location must be in range of the board");
                   }
@@ -204,25 +202,25 @@ namespace B20_Ex02
                }
 
           }
-          // poorly implemented?
-          internal static bool IsMeasurementValid(out int io_Measurement)
+
+          internal static int GetMeasurementFromUser()
           {
                bool inputIsValid = false;
-               io_Measurement = 0;
+               int measurementInput=0;
 
                while (inputIsValid == false)
                {
-                    inputIsValid = int.TryParse(Console.ReadLine(), out io_Measurement);
+                    inputIsValid = int.TryParse(Console.ReadLine(), out measurementInput);
                     if (inputIsValid == false)
                     {
                          Console.WriteLine("The input must be a number, please try again");
                     }
-                    else if(io_Measurement < 4) 
+                    else if(measurementInput < 4) 
                     {
                          Console.WriteLine("The minimum value is 4, please try again");
                          inputIsValid = false;
                     }
-                    else if (io_Measurement > 6)
+                    else if (measurementInput > 6)
                     {
                          Console.WriteLine("The maximum value is 6, please try again");
                          inputIsValid = false;
@@ -234,7 +232,7 @@ namespace B20_Ex02
                     
                }
 
-               return inputIsValid;
+               return measurementInput;
           }
           internal static void GetBoardMeasurementsFromUser(int[] io_BoardMeasurementArr)
           {
@@ -242,19 +240,13 @@ namespace B20_Ex02
                bool inputIsValid = false;
 
                do
-               { // Design isn't good 
-                    do
-                    {
-                         Console.WriteLine("Please enter the height of the board");
-
-                    }
-                    while(IsMeasurementValid(out io_BoardMeasurementArr[0]) == false);
-
-                    {
-                         Console.WriteLine("Please enter the width of the board");
-
-                    }
-                    while (IsMeasurementValid(out io_BoardMeasurementArr[1]) == false);
+               {
+                   
+                    Console.WriteLine("Please enter the height of the board");
+                    io_BoardMeasurementArr[0] = GetMeasurementFromUser();
+                    Console.WriteLine("Please enter the width of the board");
+                    io_BoardMeasurementArr[1] = GetMeasurementFromUser();
+  
                 
                     if((io_BoardMeasurementArr[0] * io_BoardMeasurementArr[1]) % 2 != 0)
                     {

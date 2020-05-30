@@ -110,7 +110,7 @@ namespace B20_Ex02
 
             for (int index = 0; i < AvailableCards.Count && isDoneRemoving == false; index++)
             {
-                isDoneRemoving = (AvailableCards.Equals(Board[i, j]));
+                isDoneRemoving = AvailableCards.Equals(Board[i, j]);
 
                 if (isDoneRemoving == true)
                 {
