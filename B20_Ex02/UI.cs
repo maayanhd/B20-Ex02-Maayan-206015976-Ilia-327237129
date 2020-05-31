@@ -304,28 +304,26 @@ namespace B20_Ex02
                PrintBorder(width);
                
                // Adding 1 to the height for printing th letters line 
-               for (int i = 0; i < height; i++)
+               for(int i = 0; i < height; i++)
                {
-                    string numberCell = string.Format(
-                                        "{0}  |",
-                                        (i + 1).ToString());
+                    string numberCell = string.Format("{0}  |", (i + 1).ToString());
 
                     Console.Write(numberCell);
 
                     // Adding 1 for the numbers color
-                    for (int j = 0; j < width; j++)
+                    for(int j = 0; j < width; j++)
                     {
                          bool isFlipped = i_MemoryCardGame.Board[i, j].IsFlipped;
                          char cellContent = isFlipped == true ? (char)i_MemoryCardGame.Board[i, j].CellContent : ' ';
-                         string cellString = string.Format(
-                                             " {0} |",
-                                             cellContent.ToString());
+                         string cellString = string.Format(" {0} |", cellContent.ToString());
                          Console.Write(cellString);
                     }
 
                     Console.Write(Environment.NewLine);
                     PrintBorder(width);
                }
+
+               Console.Write(Environment.NewLine);
           }
 
           internal static void PrintLettersLine(int i_BoardWidth)
