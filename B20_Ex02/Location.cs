@@ -11,8 +11,8 @@ namespace B20_Ex02
 
           public Location(int i_Row, int i_Col)
           {
-              m_Row = i_Row;
-              m_Col = i_Col;
+               m_Row = i_Row;
+               m_Col = i_Col;
           }
           public int Row
           {

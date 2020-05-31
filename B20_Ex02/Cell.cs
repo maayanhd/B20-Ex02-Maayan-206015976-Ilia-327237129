@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace B20_Ex02
@@ -12,7 +13,6 @@ namespace B20_Ex02
 
           public Cell(int i_CellContent, Location i_Location)
           {
-
               m_Location = i_Location;
               m_CellContent = i_CellContent;
           }
@@ -48,11 +48,6 @@ namespace B20_Ex02
                {
                     m_Location = value;
                }
-          }
-
-          public bool Equals(Cell io_CellToCompare)
-          {
-              return this.m_CellContent == io_CellToCompare.CellContent;
           }
      }
 }
