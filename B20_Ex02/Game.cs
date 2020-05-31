@@ -58,7 +58,6 @@ namespace B20_Ex02
             // in case there's a match- we'll erase the matching pair from the storage
             if (i_IsAMatch == true)
             {
-                // Can be better implemented
                 AvailableCards.Remove(i_PairOfCards[0]);
                 AvailableCards.Remove(i_PairOfCards[1]);
             }
