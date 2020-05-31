@@ -5,12 +5,12 @@ using System.Threading;
 
 namespace B20_Ex02
 {
-     class UI
+     public class UI
      {
           private UI()
           {
-
           }
+
           internal static void Start()
           {
                {
@@ -40,10 +40,10 @@ namespace B20_Ex02
 
                while (io_MemoryGame.IsTheGameEnded() == false)
                {
-                    Console.WriteLine(String.Format("{0}{1}'s turn{2}",
-                            Environment.NewLine,
-                            currentPlayer.Name,
-                            Environment.NewLine));
+                    Console.WriteLine(string.Format(
+                                        "{0}{1}'s turn{0}", 
+                                        Environment.NewLine, 
+                                        currentPlayer.Name));
 
                     // player's type is a human
                     if (currentPlayer.EPlayerType == Player.ePlayerType.Human)
@@ -55,6 +55,7 @@ namespace B20_Ex02
                     {
                          chosenCards = currentPlayer.ComputerMove(io_MemoryGame);
                     }
+
                     io_MemoryGame.FlipCard(chosenCards[0]);
                     Ex02.ConsoleUtils.Screen.Clear();
                     PrintBoard(io_MemoryGame);
@@ -67,6 +68,11 @@ namespace B20_Ex02
                     {
                          currentPlayer = (currentPlayer == io_MemoryGame.Player1) ? io_MemoryGame.Player2 : io_MemoryGame.Player1;
                     }
+                    else
+                    {
+                         Console.Write(Environment.NewLine);
+                         Console.WriteLine("Well done, you earned another turn!");
+                    }
                }
 
                DeclareWinner(io_MemoryGame.Player1, io_MemoryGame.Player2);
@@ -74,13 +80,13 @@ namespace B20_Ex02
 
           public static void DeclareWinner(params Player[] i_Players)
           {
-               Console.WriteLine(String.Format(
-                       "{0}'s Score: {1}{2}{2}{3}'s Score: {4}",
-                       i_Players[0].Name,
-                       i_Players[0].Score.ToString(),
-                       Environment.NewLine,
-                       i_Players[1].Name,
-                       i_Players[1].Score.ToString()));
+               Console.WriteLine(string.Format(
+                                   "{2}{0}'s Score: {1}{2}{3}'s Score: {4}",
+                                   i_Players[0].Name,
+                                   i_Players[0].Score.ToString(),
+                                   Environment.NewLine,
+                                   i_Players[1].Name,
+                                   i_Players[1].Score.ToString()));
 
                if (i_Players[0].Score == i_Players[1].Score)
                {
@@ -90,8 +96,9 @@ namespace B20_Ex02
                {
                     string winnerName = (i_Players[0].Score > i_Players[1].Score) ? i_Players[0].Name : i_Players[1].Name;
 
-                    Console.WriteLine("{0} won",
-                            winnerName);
+                    Console.WriteLine(string.Format(
+                                        "{0} won",
+                                        winnerName));
                }
           }
 
@@ -109,12 +116,14 @@ namespace B20_Ex02
                if (isAMatch == false)
                {    // Screen suspension for 2 seconds
                     Thread.Sleep(2000);
+
                     // Flipping back cards
                     io_MemoryGame.FlipCard(io_ChosenCards[0]);
                     io_MemoryGame.FlipCard(io_ChosenCards[1]);
                     Ex02.ConsoleUtils.Screen.Clear();
                     PrintBoard(io_MemoryGame);
                }
+
                // Logic of data structures 
                io_MemoryGame.UpdateAvailableCards(isAMatch, io_ChosenCards);
                io_MemoryGame.UpdateSeenCards(isAMatch, io_ChosenCards);
@@ -190,6 +199,7 @@ namespace B20_Ex02
 
                return name;
           }
+
           internal static void GetPlayersDetailsFromUser(string[] io_PlayersNames, Player.ePlayerType[] io_PlayersTypes)
           {
                bool inputIsValid = false;
@@ -219,7 +229,6 @@ namespace B20_Ex02
                          io_PlayersTypes[1] = (option == 1) ? Player.ePlayerType.Human : Player.ePlayerType.Computer;
                     }
                }
-
           }
 
           internal static int GetMeasurementFromUser()
@@ -248,14 +257,13 @@ namespace B20_Ex02
                     {
                          inputIsValid = true;
                     }
-
                }
 
                return measurementInput;
           }
+
           internal static void GetBoardMeasurementsFromUser(int[] io_BoardMeasurementArr)
           {
-
                bool inputIsValid = false;
 
                do
@@ -264,7 +272,6 @@ namespace B20_Ex02
                     io_BoardMeasurementArr[0] = GetMeasurementFromUser();
                     Console.WriteLine("Please enter the width of the board");
                     io_BoardMeasurementArr[1] = GetMeasurementFromUser();
-
 
                     if ((io_BoardMeasurementArr[0] * io_BoardMeasurementArr[1]) % 2 != 0)
                     {
@@ -277,6 +284,7 @@ namespace B20_Ex02
                }
                while (inputIsValid == false);
           }
+
           internal static void GenerateMemoryCards(List<int> io_MemoryCards, int i_NumOfCards)
           {
                for (int i = 0; i < i_NumOfCards / 2; i++)
@@ -291,28 +299,30 @@ namespace B20_Ex02
                int height = i_MemoryCardGame.Board.GetLength(0);
                int width = i_MemoryCardGame.Board.GetLength(1);
 
-
                PrintLettersLine(width);
                Console.Write(Environment.NewLine);
                PrintBorder(width);
+               
                // Adding 1 to the height for printing th letters line 
                for (int i = 0; i < height; i++)
                {
-                    String numberCell = String.Format("{0}  |",
-                           (i + 1).ToString());
+                    string numberCell = string.Format(
+                                        "{0}  |",
+                                        (i + 1).ToString());
 
                     Console.Write(numberCell);
 
                     // Adding 1 for the numbers color
                     for (int j = 0; j < width; j++)
                     {
-                         bool isFlipped = i_MemoryCardGame[i, j].IsFlipped;
-                         char cellContent = ((isFlipped == true) ? (char)(i_MemoryCardGame[i, j].CellContent) : ' ');
-                         String cellString = String.Format(" {0} |",
-                                cellContent.ToString());
-
+                         bool isFlipped = i_MemoryCardGame.Board[i, j].IsFlipped;
+                         char cellContent = isFlipped == true ? (char)i_MemoryCardGame.Board[i, j].CellContent : ' ';
+                         string cellString = string.Format(
+                                             " {0} |",
+                                             cellContent.ToString());
                          Console.Write(cellString);
                     }
+
                     Console.Write(Environment.NewLine);
                     PrintBorder(width);
                }
@@ -320,26 +330,29 @@ namespace B20_Ex02
 
           internal static void PrintLettersLine(int i_BoardWidth)
           {
-               String lettersLine = "    ";
+               string lettersLine = "    ";
 
                Console.Write(lettersLine);
 
                for (int i = 0; i < i_BoardWidth; i++)
                {
-                    String letterCell = String.Format(" {0}  ",
-                           (char)(i + 'A'));
+                    string letterCell = string.Format(
+                                        " {0}  ",
+                                        (char)(i + 'A'));
                     Console.Write(letterCell);
                }
           }
+
           internal static void PrintBorder(int i_BoardWidth)
           {
                StringBuilder borderEdge = new StringBuilder("   =");
-
                Console.Write(borderEdge);
+
                for (int i = 0; i < i_BoardWidth; i++)
                {
                     Console.Write("====");
                }
+
                Console.Write(Environment.NewLine);
           }
 
@@ -354,16 +367,16 @@ namespace B20_Ex02
 
           internal static bool IsGameStartingAgain()
           {
-
                bool isValidAnswer = true,
                     isGameStartsOver = false;
-               char answer = 'n';
 
                do
                {
                     Console.WriteLine("Would you like to play again? y/n");
 
-                    if (answer != 'y' && answer != 'n')
+                    string answer = Console.ReadLine();
+
+                    if (answer != "y" && answer != "n")
                     {
                          Console.WriteLine("Invalid input, please try again");
                          isValidAnswer = false;
@@ -373,12 +386,11 @@ namespace B20_Ex02
                          isValidAnswer = true;
                     }
 
-                    isGameStartsOver = (answer == 'y');
+                    isGameStartsOver = answer == "y";
                }
                while (isValidAnswer == false);
 
                return isGameStartsOver;
           }
-
      }
 }

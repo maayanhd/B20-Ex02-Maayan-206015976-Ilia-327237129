@@ -5,7 +5,7 @@ using System.Text;
 
 namespace B20_Ex02
 {
-     class Cell
+     public class Cell
      {
           private int m_CellContent;
           private bool m_IsFlipped = false;
@@ -16,34 +16,40 @@ namespace B20_Ex02
               m_Location = i_Location;
               m_CellContent = i_CellContent;
           }
+
           public int CellContent
           {
                get
                {
                     return m_CellContent;
                }
+
                set
                {
                     m_CellContent = value;
                }
           }
+
           public bool IsFlipped
           {
                get
                {
                     return m_IsFlipped;
                }
+
                set
                {
                     m_IsFlipped = value;
                }
           }
+
           public Location Location
           {
                get
                {
                     return m_Location;
                }
+
                set
                {
                     m_Location = value;
