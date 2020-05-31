@@ -37,9 +37,11 @@ namespace B20_Ex02
           {
                Player currentPlayer = io_MemoryGame.Player1;
                Cell[] chosenCards = new Cell[2];
-
+               
                while (io_MemoryGame.IsTheGameEnded() == false)
                {
+                    Ex02.ConsoleUtils.Screen.Clear();
+                    PrintBoard(io_MemoryGame);
                     Console.WriteLine(string.Format(
                                         "{0}{1}'s turn{0}", 
                                         Environment.NewLine, 
@@ -121,7 +123,6 @@ namespace B20_Ex02
                     io_MemoryGame.FlipCard(io_ChosenCards[0]);
                     io_MemoryGame.FlipCard(io_ChosenCards[1]);
                     Ex02.ConsoleUtils.Screen.Clear();
-                    PrintBoard(io_MemoryGame);
                }
 
                // Logic of data structures 
@@ -361,6 +362,7 @@ namespace B20_Ex02
                     Start();
                }
                while (IsGameStartingAgain() == true);
+               Console.WriteLine("The game is over, thank you for playing");
           }
 
           internal static bool IsGameStartingAgain()
